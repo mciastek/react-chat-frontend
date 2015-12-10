@@ -1,0 +1,9 @@
+.messages-list {
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+
+  & + .message-form {
+    margin-top: 30px;
+  }
+}

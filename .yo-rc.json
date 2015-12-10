@@ -1,0 +1,7 @@
+{
+  "generator-react-webpack": {
+    "appName": "reactChat",
+    "style": "scss",
+    "postcss": true
+  }
+}
