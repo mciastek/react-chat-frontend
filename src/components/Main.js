@@ -13,12 +13,4 @@ class AppComponent extends React.Component {
   }
 }
 
-AppComponent.propTypes = {
-  foo: React.PropTypes.string
-};
-
-AppComponent.defaultProps = {
-  foo: 'foo'
-};
-
 export default AppComponent;
