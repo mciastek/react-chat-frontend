@@ -14,6 +14,9 @@ class MessagesListComponent extends React.Component {
 
     return(
       <section className="messages-list">
+        {this.props.joined.map((userName, i) => {
+          return (<small key={i}>{userName} joined room</small>)
+        })}
         {listOfMessages}
       </section>
     );
