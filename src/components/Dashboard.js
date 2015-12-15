@@ -4,7 +4,7 @@ import React from 'react';
 import socket from 'socket.io-client';
 
 import MessageForm from './MessageForm';
-import MessagesList from './MessagesList';
+import MessagesBoard from './MessagesBoard';
 
 const sessionStorage = window.sessionStorage;
 const io = socket('http://localhost:3000');
@@ -13,7 +13,7 @@ class DashboardComponent extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { messages: [], recentlyJoined: [] };
+    this.state = { boardActivities: [] };
 
     io.on('message:receive', this._handleMessage.bind(this));
     io.on('user:joined', this._handleJoinedUsers.bind(this));
@@ -22,17 +22,24 @@ class DashboardComponent extends React.Component {
   }
 
   _handleMessage(message) {
-    var {messages} = this.state;
-    messages.push(message);
+    let {boardActivities} = this.state;
+    boardActivities.push({
+      type: 'message',
+      content: message
+    });
 
-    this.setState({messages});
+    this.setState({boardActivities});
   }
 
   _handleJoinedUsers(userName) {
-    var {recentlyJoined} = this.state;
-    recentlyJoined.push(userName);
+    let {boardActivities} = this.state;
 
-    this.setState({recentlyJoined});
+    boardActivities.push({
+      type: 'joined',
+      content: {userName}
+    });
+
+    this.setState({boardActivities});
   }
 
   handleMessageSubmit(text) {
@@ -48,7 +55,7 @@ class DashboardComponent extends React.Component {
   render() {
     return (
       <section className="chat-dashboard">
-        <MessagesList messages={this.state.messages} joined={this.state.recentlyJoined} />
+        <MessagesBoard activities={this.state.boardActivities} />
         <MessageForm onMessageSubmit={this.handleMessageSubmit.bind(this)} />
       </section>
     );
