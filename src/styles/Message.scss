@@ -1,3 +1,9 @@
 .message {
-  
+
+}
+
+.message__author {
+  &.is-current-user {
+    font-weight: 600;
+  }
 }
