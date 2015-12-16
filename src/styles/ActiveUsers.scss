@@ -1,0 +1,9 @@
+.active-users {
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+
+  .list-group-item.is-current-user {
+    font-weight: 600;
+  }
+}
