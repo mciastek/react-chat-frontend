@@ -1,24 +1,33 @@
 require('styles/Dashboard.scss');
 
 import React from 'react';
-import socket from 'socket.io-client';
+import io from 'socket.io-client';
 
+import ActiveUsers from './ActiveUsers';
 import MessageForm from './MessageForm';
 import MessagesBoard from './MessagesBoard';
 
 const sessionStorage = window.sessionStorage;
-const io = socket('http://localhost:3000');
 
 class DashboardComponent extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { boardActivities: [] };
+    const socket = io.connect('http://localhost:3000');
 
-    io.on('message:receive', this._handleMessage.bind(this));
-    io.on('user:joined', this._handleJoinedUsers.bind(this));
+    this.state = { boardActivities: [], onlineUsers: [] };
 
-    io.emit('user:joined', sessionStorage.getItem('userName'));
+    socket.on('init', this._getOnlineUsers.bind(this));
+    socket.on('message:receive', this._handleMessage.bind(this));
+    socket.on('user:joined', this._handleUserAction.bind(this));
+    socket.on('user:left', (data) => { this._handleUserAction(data, 'left'); });
+
+    socket.emit('user:joined', sessionStorage.getItem('userName'));
+  }
+
+  _getOnlineUsers(data) {
+    let {onlineUsers} = data;
+    this.setState({onlineUsers});
   }
 
   _handleMessage(message) {
@@ -31,15 +40,16 @@ class DashboardComponent extends React.Component {
     this.setState({boardActivities});
   }
 
-  _handleJoinedUsers(userName) {
+  _handleUserAction(data, action = 'joined') {
     let {boardActivities} = this.state;
+    let {userName, onlineUsers} = data;
 
     boardActivities.push({
-      type: 'joined',
-      content: {userName}
+      type: 'action',
+      content: { action, userName }
     });
 
-    this.setState({boardActivities});
+    this.setState({boardActivities, onlineUsers});
   }
 
   handleMessageSubmit(text) {
@@ -55,8 +65,15 @@ class DashboardComponent extends React.Component {
   render() {
     return (
       <section className="chat-dashboard">
-        <MessagesBoard activities={this.state.boardActivities} />
-        <MessageForm onMessageSubmit={this.handleMessageSubmit.bind(this)} />
+        <div className="row">
+          <div className="col-xs-3">
+            <ActiveUsers users={this.state.onlineUsers} />
+          </div>
+          <div className="col-xs-9">
+            <MessagesBoard activities={this.state.boardActivities} />
+            <MessageForm onMessageSubmit={this.handleMessageSubmit.bind(this)} />
+          </div>
+        </div>
       </section>
     );
   }
