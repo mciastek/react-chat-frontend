@@ -19,6 +19,7 @@ class MessageFormComponent extends React.Component {
   handleSubmitOnKey(event) {
     if (event.which === 13 && !event.shiftKey) {
       this.handleSubmit();
+      event.preventDefault();
     }
   }
 
@@ -26,7 +27,7 @@ class MessageFormComponent extends React.Component {
     return (
       <section className="message-form">
         <div className="form-group">
-          <textarea className="form-control" placeholder="Your message..." value={this.state.text} onChange={this.handleTextChange.bind(this)} onKeyUp={this.handleSubmitOnKey.bind(this)}></textarea>
+          <textarea className="form-control" placeholder="Your message..." value={this.state.text} onChange={this.handleTextChange.bind(this)} onKeyDown={this.handleSubmitOnKey.bind(this)}></textarea>
         </div>
         <div className="form-group">
           <button type="button" className="btn btn-primary-outline" onClick={this.handleSubmit.bind(this)}>Send</button>
