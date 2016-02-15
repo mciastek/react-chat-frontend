@@ -1,4 +1,4 @@
-require('styles/Login.scss');
+import 'styles/Login.scss';
 
 import React from 'react';
 import { PropTypes } from 'react-router'

@@ -1,5 +1,5 @@
-require('bootstrap/scss/bootstrap-flex.scss');
-require('styles/App.scss');
+import 'bootstrap/scss/bootstrap-flex.scss';
+import 'styles/App.scss';
 
 import React from 'react';
 

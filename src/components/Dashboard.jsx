@@ -1,4 +1,4 @@
-require('styles/Dashboard.scss');
+import 'styles/Dashboard.scss';
 
 import React from 'react';
 import io from 'socket.io-client';
@@ -13,43 +13,56 @@ class DashboardComponent extends React.Component {
   constructor(props) {
     super(props);
 
-    const socket = io.connect('http://localhost:3000');
+    this.socket = io.connect('http://localhost:3000');
 
-    this.state = { boardActivities: [], onlineUsers: [] };
+    this.state = {
+      boardActivities: [],
+      onlineUsers: []
+    };
 
-    socket.on('init', this._getOnlineUsers.bind(this));
-    socket.on('message:receive', this._handleMessage.bind(this));
-    socket.on('user:joined', this._handleUserAction.bind(this));
-    socket.on('user:left', (data) => { this._handleUserAction(data, 'left'); });
+    this.socket.on('init', this._getOnlineUsers.bind(this));
+    this.socket.on('message:receive', this._handleMessage.bind(this));
+    this.socket.on('user:joined', this._handleUserAction.bind(this));
+    this.socket.on('user:left', (data) => { this._handleUserAction(data, 'left'); });
 
-    socket.emit('user:joined', sessionStorage.getItem('userName'));
+    this.socket.emit('user:joined', sessionStorage.getItem('userName'));
   }
 
   _getOnlineUsers(data) {
-    let {onlineUsers} = data;
-    this.setState({onlineUsers});
+    let { onlineUsers } = data;
+    const currentUser = sessionStorage.getItem('userName');
+
+    if (onlineUsers.indexOf(currentUser) === -1) {
+      onlineUsers = [
+        currentUser,
+        ...onlineUsers
+      ];
+    }
+
+    this.setState({ onlineUsers });
   }
 
   _handleMessage(message) {
-    let {boardActivities} = this.state;
+    let { boardActivities } = this.state;
+
     boardActivities.push({
       type: 'message',
       content: message
     });
 
-    this.setState({boardActivities});
+    this.setState({ boardActivities });
   }
 
   _handleUserAction(data, action = 'joined') {
-    let {boardActivities} = this.state;
-    let {userName, onlineUsers} = data;
+    let { boardActivities } = this.state;
+    let { userName, onlineUsers } = data;
 
     boardActivities.push({
       type: 'action',
       content: { action, userName }
     });
 
-    this.setState({boardActivities, onlineUsers});
+    this.setState({ boardActivities, onlineUsers });
   }
 
   handleMessageSubmit(text) {
@@ -59,7 +72,7 @@ class DashboardComponent extends React.Component {
     };
 
     this._handleMessage(message);
-    io.emit('message:send', message);
+    this.socket.emit('message:send', message);
   }
 
   render() {
